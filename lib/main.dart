@@ -4,9 +4,6 @@ import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:webservices/MODEL/soccer.dart';
 
-import 'MODEL/posiciones.dart';
-import 'MODEL/usuarios.dart';
-
 void main() => runApp(App());
 
 class App extends StatelessWidget {
@@ -26,99 +23,6 @@ class App extends StatelessWidget {
 class HomePage extends StatefulWidget {
   @override
   _HomePageState createState() => _HomePageState();
-}
-
-class _HomePageState2 extends State<HomePage> {
-  List<Usuarios> _usuario = List<Usuarios>();
-  List<Usuarios> _mostrarUsuario = List<Usuarios>();
-
-  Future<List<Usuarios>> fetchUsers() async {
-    var url = 'https://jsonfy.com/users';
-    var response = await http.get(url);
-
-    var usuario = List<Usuarios>();
-
-    if (response.statusCode == 200) {
-      var usuarioJson = json.decode(response.body);
-      for (var usuarioJson in usuarioJson) {
-        usuario.add(Usuarios.fromJson(usuarioJson));
-      }
-    }
-    return usuario;
-  }
-
-  @override
-  void initState() {
-    fetchUsers().then((value) {
-      setState(() {
-        _usuario.addAll(value);
-        _mostrarUsuario = _usuario;
-      });
-    });
-    super.initState();
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-        appBar: AppBar(
-          title: Text('WEBSERVICE LISTA DE USUARIOS'),
-          backgroundColor: Colors.black,
-        ),
-        body: ListView.builder(
-          itemBuilder: (context, index) {
-            return index == 0 ? _busqueda() : _listaUsuarios(index - 1);
-          },
-          itemCount: _mostrarUsuario.length + 1,
-        ));
-  }
-
-  _busqueda() {
-    return Padding(
-      padding: const EdgeInsets.all(10.0),
-      child: TextField(
-        decoration: InputDecoration(hintText: 'INGRESA EL NOMBRE A BUSCAR...'),
-        onSubmitted: (texto) {
-          texto = texto.toLowerCase();
-          setState(() {
-            _mostrarUsuario = _usuario.where((nombre) {
-              var usuarioNombre = nombre.name.toLowerCase();
-              return usuarioNombre.contains(texto);
-            }).toList();
-          });
-        },
-      ),
-    );
-  }
-
-  _listaUsuarios(index) {
-    return Card(
-      child: Padding(
-        padding: const EdgeInsets.only(
-            top: 24.0, bottom: 24.0, left: 16.0, right: 16.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.center,
-          children: <Widget>[
-            Text(
-              _mostrarUsuario[index].name,
-              style: TextStyle(
-                fontSize: 22,
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-            Text(
-              _mostrarUsuario[index].email,
-              style: TextStyle(fontSize: 16, color: Colors.blue),
-            ),
-            Text(
-              'Edad: ' + _mostrarUsuario[index].age,
-              style: TextStyle(fontSize: 16, color: Colors.red[500]),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
 }
 
 class _HomePageState extends State<HomePage> {
@@ -168,22 +72,23 @@ Product _parseJsonForCrossword(String jsonString) {
   Widget build(BuildContext context) {
     return Scaffold(
         appBar: AppBar(
-          title: Text('WEBSERVICE LISTA DE USUARIOS'),
-          backgroundColor: Colors.black,
+          title: Text('EQUIPOS DE FUTBOL'),
+          backgroundColor: Colors.redAccent,
         ),
         body: ListView.builder(
           itemBuilder: (context, index) {
-            return index == 0 ? _busqueda() : _listaUsuarios(index - 1);
+            return index == 0 ? _search() : _listaEquipos(index - 1);
           },
           itemCount: _teamsList.length + 1,
         ));
   }
 
-  _busqueda() {
+  _search() {
     return Padding(
-      padding: const EdgeInsets.all(10.0),
+      padding: const EdgeInsets.all(20.0),
       child: TextField(
-        decoration: InputDecoration(hintText: 'INGRESA EL EQUIPO'),
+        decoration:
+            InputDecoration(hintText: 'INGRESA EL EQUIPO (ejemplo: ARSENAL)'),
         onSubmitted: (texto) {
           texto = texto.toLowerCase();
           loadProduct(texto.toString()).then((value) {
@@ -197,20 +102,49 @@ Product _parseJsonForCrossword(String jsonString) {
     );
   }
 
-  _listaUsuarios(index) {
+  _listaEquipos(index) {
+    if (_teamsList[index].strTeamLogo == null) {
+      _teamsList[index].strTeamLogo =
+          "https://cdn.shopify.com/s/files/1/0726/6249/products/No-Logo_b95bbc7f-d67b-4ab5-9ce2-bd5e15496bca.png?v=1515588320";
+    }
     return Card(
       child: Padding(
         padding: const EdgeInsets.only(
-            top: 24.0, bottom: 24.0, left: 16.0, right: 16.0),
+            top: 24.0, bottom: 40.0, left: 16.0, right: 16.0),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.center,
           children: <Widget>[
             Text(
-              _teamsList[index].strAlternate,
+              'Nombre: ' + _teamsList[index].strTeam,
               style: TextStyle(
-                fontSize: 22,
+                fontSize: 14,
                 fontWeight: FontWeight.bold,
               ),
+            ),
+            Text(
+              'APODO: ' + _teamsList[index].strAlternate,
+              style: TextStyle(
+                fontSize: 14,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+            Text(
+              'ESTADIO: ' + _teamsList[index].strStadium,
+              style: TextStyle(
+                fontSize: 14,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+            Text(
+              'LIGA: ' + _teamsList[index].strLeague,
+              style: TextStyle(
+                fontSize: 14,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+            Image.network(
+              _teamsList[index].strTeamLogo,
+              height: 80,
             )
           ],
         ),

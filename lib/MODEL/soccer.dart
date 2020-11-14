@@ -13,12 +13,12 @@ class Search {
 }
 
 class Teams {
-  final String strTeam;
-  final String strAlternate;
-  final String strLeague;
-  final String strStadium;
-  final String strDescriptionES;
-  final String strTeamLogo;
+  String strTeam;
+  String strAlternate;
+  String strLeague;
+  String strStadium;
+  String strDescriptionES;
+  String strTeamLogo;
 
   Teams(
       {this.strTeam,
